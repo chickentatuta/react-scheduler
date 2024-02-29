@@ -11,7 +11,7 @@
     "coverage": "vitest run --coverage",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
-    "prepare": "npx lint-staged"
+    "prepare": "husky install"
   },
   "dependencies": {
     "react": "^18.2.0",
