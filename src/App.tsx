@@ -1,35 +1,99 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect, useState } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+/** タイマーの長さ */
+const TIMER_LENGTH = { work: 40 * 60, break: 20 * 60 } as const;
+type TIMER_LENGTH = typeof TIMER_LENGTH[keyof typeof TIMER_LENGTH];
+
+/** タイマーモード */
+type TimerMode = "work" | "break";
+
+interface State {
+  timeLeft: number;
+  isTimerOn: boolean;
+  timerMode: TimerMode;
+}
+
+/** タイマーのカウントのsetIntervalのID */
+let timerCountInterval = 0;
+
+/**
+ * 秒の数値をMM:SS形式の文字列に変換します。
+ * @param {number} second 秒
+ * @returns MM:SS形式の文字列
+ */
+const secondToMMSS = (second: number) => {
+  const MM =
+    second >= 10 * 60
+      ? Math.floor(second / 60).toString()
+      : second >= 1 * 60
+      ? "0" + Math.floor(second / 60).toString()
+      : "00";
+  const SS = second % 60 >= 10 ? second % 60 : "0" + (second % 60);
+  return MM + ":" + SS;
+};
+
+const App = () => {
+  const [state, setState] = useState<State>({
+    timeLeft: TIMER_LENGTH.work,
+    isTimerOn: false,
+    timerMode: "work",
+  });
+
+  useEffect(() => {
+    return () => {
+      clearInterval(timerCountInterval);
+    };
+  }, []);
+
+  const onButtonClick = () => {
+    setState((state) => {
+      clearInterval(timerCountInterval);
+      if (state.isTimerOn) {
+        return {
+          ...state,
+          timeLeft: TIMER_LENGTH.work,
+          timerMode: "work",
+          isTimerOn: false,
+        };
+      }
+      timerCountInterval = window.setInterval(() => {
+        timerCount();
+      }, 1000);
+      return { ...state, isTimerOn: true };
+    });
+  };
+
+  const timerCount = () => {
+    setState((state) => {
+      if (state.timeLeft <= 0) {
+        state = toggleTimerMode(state);
+      }
+      return { ...state, timeLeft: state.timeLeft - 1 };
+    });
+  };
+
+  const toggleTimerMode = (state: State): State => {
+    const timeLeft =
+      state.timerMode === "work" ? TIMER_LENGTH.break : TIMER_LENGTH.work;
+    const timerMode = state.timerMode === "work" ? "break" : "work";
+    return {
+      ...state,
+      timeLeft: timeLeft,
+      timerMode: timerMode,
+    };
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div data-testid="timeLeft">{secondToMMSS(state.timeLeft)}</div>
+      <button data-testid="timerButton" onClick={onButtonClick}>
+        {state.isTimerOn ? "停止" : "開始"}
+      </button>
+      <div data-testid="timerMode">
+        {state.timerMode === "work" ? "作業" : "休憩"}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;
