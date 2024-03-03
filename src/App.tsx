@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 /** タイマーの長さ */
 const TIMER_LENGTH = { work: 40 * 60, break: 20 * 60 } as const;
