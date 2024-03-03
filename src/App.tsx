@@ -85,12 +85,19 @@ const App = () => {
 
   return (
     <>
-      <div data-testid="timeLeft">{secondToMMSS(state.timeLeft)}</div>
-      <button data-testid="timerButton" onClick={onButtonClick}>
-        {state.isTimerOn ? "停止" : "開始"}
-      </button>
-      <div data-testid="timerMode">
-        {state.timerMode === "work" ? "作業" : "休憩"}
+      <div className="bg-green-200 font-body px-3">
+        <h1 className=" text-4xl text-green-600 py-2">Let's flow time !</h1>
+      </div>
+      <div className="m-10 mt-20 font-body font-bold text-center text-9xl" data-testid="timeLeft">
+        {secondToMMSS(state.timeLeft)}
+      </div>
+      <div className="text-center w-full" >
+        <button className="bg-gray-500 hover:bg-gray-400 text-3xl text-white rounded px-20 py-3" data-testid="timerButton" onClick={onButtonClick}>
+          {state.isTimerOn ? "stop" : "start"}
+        </button>        
+      </div>
+      <div className="font-body m-20 text-6xl text-center" data-testid="timerMode">
+        {state.timerMode === "work" ? "work!" : "coffee break"}
       </div>
     </>
   );
